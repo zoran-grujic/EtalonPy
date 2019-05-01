@@ -1,6 +1,6 @@
 # Python script za Etalon dužine
 
-Nadgleda i navodi Arduino DUE kako bi laser bio lokovan na određenom prelazu u jodnoj ćeliji.
+Nadgleda i navodi Arduino DUE kako bi laser bio zaključan na određenom prelazu u jodnoj ćeliji.
 
 ## Upotreba
 
@@ -12,4 +12,4 @@ Fajl `app.pyw` je samo okvir korisničkog interfejsa. Najveći deo posla obavlja
 
 ## GIT 
 
-Kopija projekta se čuva na GitLab-u.
+Kopija projekta se čuva na GitLab-u. https://gitlab.com/zoran-grujic/etalonpy

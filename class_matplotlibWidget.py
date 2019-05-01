@@ -6,6 +6,7 @@ import sys
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
 import matplotlib
+import matplotlib.pyplot as pyplot
 import numpy as np
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication, QSizePolicy
@@ -25,6 +26,7 @@ class MatplotlibWidget(QtWidgets.QWidget):
 
     def __init__(self, width=4, height=4, parent=None):
         super(MatplotlibWidget, self).__init__(parent)
+        pyplot.style.use('dark_background')  # set dark theme 
 
         #self.figure = Figure(figsize=(width, height))
         self.figure = Figure()
@@ -32,6 +34,7 @@ class MatplotlibWidget(QtWidgets.QWidget):
         self.canvas.mpl_connect('pick_event', self.onpick)
 
         self.plt = self.figure.add_subplot(111)
+
 
         self.layout = QtWidgets.QHBoxLayout(self)#QVBoxLayout
         self.layout.addWidget(self.canvas)
@@ -50,7 +53,7 @@ class MatplotlibWidget(QtWidgets.QWidget):
                 self.plt.axvline(v)
 
     def plot(self, x, y=[], line='o', clear=True):
-        #print("on_threadPlot_plotNowSignal: enter")
+        # print("on_threadPlot_plotNowSignal: enter")
         if clear:
             self.plt.clear()
         if line != 'o':

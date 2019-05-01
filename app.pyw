@@ -3,29 +3,15 @@
 #  Please feel free to ask me for permission to use my code in your own projects. It is for your own well fare!
 
 import sys
-import os
-import glob
-import serial  # conda install pyserial
-import h5py  # conda install h5py
-import sip  # pip install sip
-import time
-import numpy as np
-import threading
 import logging
-
-import class_matplotlibWidget
-import class_signal
-from class_circularBuffer import CircularBuffer
-
-import class_centralWidget
-
-import class_MySerial
-
 from PyQt5 import QtCore  # conda install pyqt
 # from PyQt5.QtCore import Qt
 from PyQt5 import QtGui
 from PyQt5 import QtWidgets
+import qdarkgraystyle  #  https://pypi.org/project/qdarkgraystyle/
 
+import class_centralWidget
+import class_signal
 
 class MainWindow(QtWidgets.QMainWindow):
 
@@ -68,14 +54,8 @@ class MainWindow(QtWidgets.QMainWindow):
 def main():
 
     app = QtWidgets.QApplication(sys.argv)
-    # import BreezeStyleSheets.breeze_resources  #  https://github.com/Alexhuszagh/BreezeStyleSheets
-    # app.setStyle(QtWidgets.QStyleFactory.create('WindowsXP'))
-    # print(QtWidgets.QStyleFactory.keys())  # ['Windows', 'WindowsXP', 'WindowsVista', 'Fusion']
-    # app.exec_()  # execute connectingForm until closed
-    # file = QtCore.QFile(":/light.qss")
-    # file.open(QtCore.QFile.ReadOnly | QtCore.QFile.Text)
-    # stream = QtCore.QTextStream(file)
-    # app.setStyleSheet(stream.readAll())
+    app.setStyleSheet(qdarkgraystyle.load_stylesheet())
+
     MainWindow()
     sys.exit(app.exec_())
     # del mf
