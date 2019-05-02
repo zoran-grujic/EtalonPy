@@ -26,19 +26,20 @@ class MatplotlibWidget(QtWidgets.QWidget):
 
     def __init__(self, width=4, height=4, parent=None):
         super(MatplotlibWidget, self).__init__(parent)
-        pyplot.style.use('dark_background')  # set dark theme 
+        pyplot.style.use('dark_background')  # set dark theme # pip install qdarkgraystyle
+        pyplot.subplots(constrained_layout=False)
 
         #self.figure = Figure(figsize=(width, height))
-        self.figure = Figure()
+        self.figure = Figure(constrained_layout=True)
         self.canvas = FigureCanvasQTAgg(self.figure)
         self.canvas.mpl_connect('pick_event', self.onpick)
 
         self.plt = self.figure.add_subplot(111)
 
-
         self.layout = QtWidgets.QHBoxLayout(self)#QVBoxLayout
         self.layout.addWidget(self.canvas)
         self.setLayout(self.layout)
+
 
     def set(self):
         if self.xLabel is not False:
