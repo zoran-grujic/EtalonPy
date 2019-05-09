@@ -29,7 +29,7 @@ class MatplotlibWidget(QtWidgets.QWidget):
         pyplot.style.use('dark_background')  # set dark theme # pip install qdarkgraystyle
         pyplot.subplots(constrained_layout=False)
 
-        #self.figure = Figure(figsize=(width, height))
+        # self.figure = Figure(figsize=(width, height))
         self.figure = Figure(constrained_layout=True)
         self.canvas = FigureCanvasQTAgg(self.figure)
         self.canvas.mpl_connect('pick_event', self.onpick)
@@ -68,7 +68,7 @@ class MatplotlibWidget(QtWidgets.QWidget):
         #self.canvas.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         #self.canvas.updateGeometry()
         self.canvas.draw()
-        
+
     def plot_date(self, x, y, line = 'o'):
         #print("on_threadPlot_plotNowSignal: enter")
         self.plt.clear()
@@ -91,7 +91,7 @@ class MatplotlibWidget(QtWidgets.QWidget):
             print(n )
             print(bins)
             print(patches)"""
-        
+
         self.canvas.draw()
 
     """
@@ -105,10 +105,10 @@ class MatplotlibWidget(QtWidgets.QWidget):
         print(mouseevent)
         print(artist)
 
-        
+
 if __name__ == "__main__":
     #run the script
- 
+
     app = QApplication(sys.argv)
     mw = MatplotlibWidget(10,2)
     mu, sigma = 100, 15

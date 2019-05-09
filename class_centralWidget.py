@@ -248,7 +248,7 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
     def readDUE(self):
         while True:
             try:
-                if self.due.box.in_waiting > 0:
+                while self.due.box.in_waiting > 0:
                     line = self.due.readLine()
                     #  print(line)
 
@@ -288,7 +288,7 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
                 if parts[0] == 'scan':
                     self.mode = parts[0]
                 else:
-                    print("readDUE: "+str(e))
+                    print("readDUE: "+str(e) + " - " + line)
 
             time.sleep(0.02)  # save processor time
 

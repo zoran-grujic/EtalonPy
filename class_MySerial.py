@@ -11,6 +11,7 @@ import time
 
 
 class MySerial:
+    # define start values, constants
     baud = 250000
     time_out = .5
     port = ""
