@@ -1,6 +1,7 @@
 #  Copyright (c) 2019.
 #  This code has been produced by Zoran D. Grujic and by the knowledge found on The Internet.
 #  Please feel free to ask me for permission to use my code in your own projects. It is for your own well fare!
+#  pyinstaller --onefile -w app.pyw
 
 import sys
 import logging
@@ -12,6 +13,7 @@ import qdarkgraystyle  #  https://pypi.org/project/qdarkgraystyle/
 
 import class_centralWidget
 import class_signal
+
 
 class MainWindow(QtWidgets.QMainWindow):
 

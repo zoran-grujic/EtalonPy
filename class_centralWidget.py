@@ -23,31 +23,35 @@ from PyQt5 import QtCore  # conda install pyqt
 # from PyQt5.QtCore import Qt
 from PyQt5 import QtGui
 from PyQt5 import QtWidgets
+import pyqtgraph as pg  # Fast plot package
+# import pyqtgraph.examples
+# pyqtgraph.examples.run()
 
 
 class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
     name = "Etalon"
     due = False  # connection to Arduino DUE
     timer = False  # timer to read ports
-    timerDisplayTime_ms = 1000
+    timerDisplayTime_ms = 100
     data = False
     thread_readDue = False
-    R_data = CircularBuffer(100)
-    fi_data = CircularBuffer(100)
-    X_data = CircularBuffer(100)
-    Y_data = CircularBuffer(100)
-    pos_data = CircularBuffer(100)
-    time_ms_data = CircularBuffer(100)
+    R_data = CircularBuffer(200)
+    fi_data = CircularBuffer(200)
+    X_data = CircularBuffer(200)
+    Y_data = CircularBuffer(200)
+    pos_data = CircularBuffer(200)
+    time_ms_data = CircularBuffer(200)
 
     mode = "scan"  # scan ili lock
 
     # scan
     scanPoints = 50         # pts
-    scanStart = 0           # 0-4095
-    scanStop = 4095         # 0-4095
+    scanStart = 0           # 0-65535
+    scanStop = 65535         # 0-65535
     scanIntegration_ms = 500   # ms
     scanPositions_int = []
     scanPosGen = None
+    scanPhase_deg = 0
     scanData = []
 
     def __init__(self, parent):
@@ -61,7 +65,7 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
 
         # odložena promena parametara scan-a
         self.timerScanChange = QtCore.QTimer(self)  # make timer to belong to the MainForm class
-        self.timerScanChange.setInterval(2000)
+        self.timerScanChange.setInterval(500)
         self.timerScanChange.timeout.connect(self.scanChanged)
         self.timerScanChange.setSingleShot(True)
 
@@ -91,10 +95,6 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
         self.portLabel.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
         # self.portLabel.setFixedWidth(80)
 
-
-
-
-
         # -------------------------------------------
         # make tabs
         # -------------------------------------------
@@ -103,29 +103,36 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
         self.tabLock = QtWidgets.QWidget()
 
         # tab scan plots
-        self.plotScanR = class_matplotlibWidget.MatplotlibWidget(20, 2, self.tabScan)
-        self.plotScanR.xLabel = "pozicija (#)"
-        self.plotScanR.yLabel = 'R (arb. u.)'
-        self.plotScanR.line = 'o'
+        self.olovkaScanX = pg.mkPen((100, 200, 250), width=2, style=QtCore.Qt.SolidLine)
+        # symbol = 'o'
+        self.plotScanX = pg.PlotWidget()  # class_matplotlibWidget.MatplotlibWidget(20, 2, self.tabScan)
+        #  self.plotScanX.xLabel = "pozicija (#)"
+        #  self.plotScanX.yLabel = 'R (arb. u.)'
+        #  self.plotScanX.line = 'o'
 
-        self.plotScanfi = class_matplotlibWidget.MatplotlibWidget(20, 2, self.tabScan)
-        self.plotScanfi.xLabel = "pozicija (#)"
-        self.plotScanfi.yLabel = '$\phi$ ($^\circ$)'
-        self.plotScanfi.line = 'o'
+        self.plotScanX.setLabel('left', '<font>X</font>', units='<font>arb. u.</font>', color='white', **{'font-size': '10pt'})
+        self.plotScanX.setLabel('bottom', '<font>pozicija</font>', units='<font>V</font>', color='white', **{'font-size': '10pt'})
 
-        # tab lock plots
-        self.plotR = class_matplotlibWidget.MatplotlibWidget(20, 2, self.tabLock)
-        # x = range(0, 100, 10)
-        # y = [np.sin(xx / 10) for xx in x]
-        self.plotR.xLabel = 'vreme (s)'
-        self.plotR.yLabel = 'R (arb. u.)'
-        self.plotR.line = '-'
-        # self.plotR.plot(x, y)
+        self.olovkaScanY = pg.mkPen((100, 200, 250), width=2, style=QtCore.Qt.SolidLine)
+        self.plotScanY = pg.PlotWidget()
+        # self.plotScanY = class_matplotlibWidget.MatplotlibWidget(20, 2, self.tabScan)
+        # self.plotScanY.xLabel = "pozicija (#)"
+        # self.plotScanY.yLabel = '$\phi$ ($^\circ$)'
+        # self.plotScanY.line = 'o'
+        self.plotScanY.setLabel('left', '<font>Y</font>', units='<font>arb . u.</font>', color='white',
+                                **{'font-size': '10pt'})
+        self.plotScanY.setLabel('bottom', '<font>pozicija</font>', units='<font>V</font>', color='white',
+                                **{'font-size': '10pt'})
 
-        self.plotfi = class_matplotlibWidget.MatplotlibWidget(20, 2, self.tabLock)
-        self.plotfi.xLabel = 'vreme (s)'
-        self.plotfi.yLabel = '$\phi$ ($^\circ$)'
-        self.plotfi.line = '-'
+        self.olovkaX = pg.mkPen((100, 200, 250), width=2, style=QtCore.Qt.SolidLine)
+        self.plotX = pg.PlotWidget()
+        self.plotX.setLabel('left', '<font>X</font>', units='<font>arb. u.</font>', color='white', **{'font-size': '10pt'})
+        self.plotX.setLabel('bottom', '<font>vreme</font>', units='<font>s</font>', color='white', **{'font-size': '10pt'})
+
+        self.olovkaY = pg.mkPen((100, 200, 250), width=2, style=QtCore.Qt.SolidLine)
+        self.plotX = pg.PlotWidget()
+        self.plotX.setLabel('left', '<font>Y</font>', units='<font>arb. u.</font>', color='white', **{'font-size': '10pt'})
+        self.plotX.setLabel('bottom', '<font>vreme</font>', units='<font>s</font>', color='white', **{'font-size': '10pt'})
 
         # tab buttons
         self.startScanButton = QtWidgets.QPushButton("Počni scan", self.tabScan)
@@ -157,8 +164,8 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
         self.scanStopQDoubleSpinBox = QtWidgets.QDoubleSpinBox(self.tabScan)  # Serial port preview
         self.scanStopQDoubleSpinBox.name = "ScanStop"
         self.scanStopQDoubleSpinBox.setRange(0, 100)
-        self.scanStopQDoubleSpinBox.setSingleStep(100 / 4095)
-        self.scanStopQDoubleSpinBox.setValue(100 * self.scanStop/4095)
+        self.scanStopQDoubleSpinBox.setSingleStep(100 / 65535)
+        self.scanStopQDoubleSpinBox.setValue(100 * self.scanStop/65535)
         self.scanStopQDoubleSpinBox.setSuffix(" %")
         self.scanStopQDoubleSpinBox.setDecimals(3)
         self.scanStopQDoubleSpinBox.valueChanged.connect(self.delayChange)
@@ -167,13 +174,23 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
 
         self.scanIntegrationQDoubleSpinBox = QtWidgets.QSpinBox(self.tabScan)  # Serial port preview
         self.scanIntegrationQDoubleSpinBox.name = "ScanStop"
-        self.scanIntegrationQDoubleSpinBox.setRange(200, 5000)
+        self.scanIntegrationQDoubleSpinBox.setRange(50, 5000)
         self.scanIntegrationQDoubleSpinBox.setSingleStep(10)
         self.scanIntegrationQDoubleSpinBox.setValue(self.scanIntegration_ms)
         self.scanIntegrationQDoubleSpinBox.setSuffix(" ms")
         self.scanIntegrationQDoubleSpinBox.valueChanged.connect(self.delayChange)
         tt = "Koliko dugo snimati svaku tačku?"
         self.scanIntegrationQDoubleSpinBox.setToolTip('<span style="color:#555555;">' + tt + '</span>')
+
+        self.scanPhaseQDoubleSpinBox = QtWidgets.QSpinBox(self.tabScan)  # Serial port preview
+        self.scanPhaseQDoubleSpinBox.name = "ScanStop"
+        self.scanPhaseQDoubleSpinBox.setRange(-360, 360)
+        self.scanPhaseQDoubleSpinBox.setSingleStep(1)
+        self.scanPhaseQDoubleSpinBox.setValue(self.scanPhase_deg)
+        self.scanPhaseQDoubleSpinBox.setSuffix(" deg")
+        self.scanPhaseQDoubleSpinBox.valueChanged.connect(self.delayChange)
+        tt = "Treba li pomeriti fazu reference?"
+        self.scanPhaseQDoubleSpinBox.setToolTip('<span style="color:#555555;">' + tt + '</span>')
 
         # ------------------------------------------
         # set layout
@@ -190,6 +207,10 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
         self.thread_readDue.setDaemon(True)
         self.thread_readDue.start()
 
+        command = "phase " + str(self.scanPhase_deg) + " " + str(self.scanPhase_deg)
+        self.due.sendToBox(command)
+        self.due.sendToBox(command)
+
         self.timer.start()
 
     def scanChanged(self):
@@ -202,18 +223,25 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
         # print(str(self.percentTo4095(sender.value())))
         # return MainForm.percentTo4095(sender.value())
 
+        if int(self.scanPhaseQDoubleSpinBox.value()) != self.scanPhase_deg:
+            self.scanPhase_deg = int(self.scanPhaseQDoubleSpinBox.value())
+            command = "phase " + str(self.scanPhase_deg) + " " + str(self.scanPhase_deg)
+            self.due.sendToBox(command)
+            self.due.sendToBox(command)
+
         if self.scanIntegrationQDoubleSpinBox.value() != self.scanIntegration_ms:
             self.scanIntegration_ms = self.scanIntegrationQDoubleSpinBox.value()
+            self.timerScan.setInterval(self.scanIntegration_ms)
 
-        newStart = self.percentTo4095(self.scanStartQDoubleSpinBox.value())
-        newStop = self.percentTo4095(self.scanStopQDoubleSpinBox.value())
+        newStart = self.percentTo65535(self.scanStartQDoubleSpinBox.value())
+        newStop = self.percentTo65535(self.scanStopQDoubleSpinBox.value())
         newPoints = int(self.scanPointsLineEdit.text())
         if newStart != self.scanStart or newStop != self.scanStop or newPoints != self.scanPoints:
             # ima promena
             if newStop - newStart < newPoints:
                 # ne može, vrati stare vrednosti!
-                self.scanStartQDoubleSpinBox.setValue((self.scanStart * 100)/4095)
-                self.scanStopQDoubleSpinBox.setValue((self.scanStop * 100) / 4095)
+                self.scanStartQDoubleSpinBox.setValue((self.scanStart * 100)/65535)
+                self.scanStopQDoubleSpinBox.setValue((self.scanStop * 100) / 65535)
                 self.self.scanPointsLineEdit.setText(str(self.scanPoints))
             else:
                 # usvoji nove vrednosti
@@ -227,6 +255,7 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
     def delayChange(self):
         print("delayChange")
         # sender = self.sender()
+
         if self.timerScanChange.isActive():
             # dok timer ne završi nove promene se ignorišu
             print("Timer Active")
@@ -245,12 +274,17 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
     def percentTo4095(val):
         return int(val*4095/100)
 
+    @staticmethod
+    def percentTo65535(val):
+        return int(val * 65535 / 100)
+
     def readDUE(self):
         while True:
             try:
                 while self.due.box.in_waiting > 0:
                     line = self.due.readLine()
                     #  print(line)
+                    #  print(line.split()[0])
 
                     pos, x, y, time_ms = [float(s) for s in line.split(", ")]
                     pos = int(pos)
@@ -258,10 +292,10 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
                     self.pos_data.append(int(pos))
                     self.X_data.append(x)
                     self.Y_data.append(y)
-                    r = np.sqrt(x ** 2 + y ** 2)
-                    self.R_data.append(r)
-                    fi = np.degrees(np.arctan2(y, x))
-                    self.fi_data.append(fi)
+                    # r = np.sqrt(x ** 2 + y ** 2)
+                    # self.R_data.append(r)
+                    # fi = np.degrees(np.arctan2(y, x))
+                    # self.fi_data.append(fi)
                     self.time_ms_data.append(int(time_ms))
 
                     if self.mode == 'scan':
@@ -274,11 +308,11 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
                                 # print(e)
                             # print(index)
                             if index == -1:
-                                self.scanData.append([pos, r, fi])
+                                self.scanData.append([pos, x, y])
                             else:
                                 # pregaziti staru vrednost
 
-                                self.scanData[index] = [pos, r, fi]
+                                self.scanData[index] = [pos, x, y]
                                 # print("pregazi")
 
 
@@ -288,7 +322,10 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
                 if parts[0] == 'scan':
                     self.mode = parts[0]
                 else:
-                    print("readDUE: "+str(e) + " - " + line)
+                    if parts[0] == 'Error':
+                        print("readDUE: " + line)
+                    else:
+                        print("readDUE: "+str(e) + " - " + line)
 
             time.sleep(0.02)  # save processor time
 
@@ -306,22 +343,33 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
             t = list(self.time_ms_data)
             t = [(v - t[-1])/1000 for v in t]
             r = list(self.R_data)
-            fi = list(self.fi_data)
+            fi = list(self.Y_data)
             # t = (timear - timear[-1])/1000
             #print(len(t))
             #print(len(np.array(self.R_data)))
             #print(len(np.array(self.fi_data)))
-            self.plotR.plot(t, r)
-            self.plotfi.plot(t, fi)
+
+            self.plotX.clear()  # o;isti graph
+            self.plotX.plot(t, r, pen=self.olovkaX)  #  m, y, k, w
+            self.plotX.clear()  # o;isti graph
+            self.plotX.plot(t, fi, pen=self.olovkaY)
         elif self.mode == "scan":
             # print(self.scanData)
             if len(self.scanData) > 3:
                 pos = [l[0] for l in self.scanData]
+                pos = 4*np.array(pos)/65535
                 r = [l[1] for l in self.scanData]
                 fi = [l[2] for l in self.scanData]
 
-                self.plotScanR.plot(pos, r)
-                self.plotScanfi.plot(pos, fi)
+                d = np.transpose([pos, r])
+                d = d[d[:, 0].argsort()]
+                self.plotScanX.clear()
+                self.plotScanX.plot(d, symbol='o', pen=self.olovkaScanX)
+
+                d = np.transpose([pos, fi])
+                d = d[d[:, 0].argsort()]
+                self.plotScanY.clear()
+                self.plotScanY.plot(d, symbol='o', pen=self.olovkaScanY)
                 # print("scan tab plots")
 
         else:
@@ -330,8 +378,8 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
     def setUIlayout(self):
 
         tabScanPlotLayout = QtWidgets.QVBoxLayout()
-        tabScanPlotLayout.addWidget(self.plotScanR)
-        tabScanPlotLayout.addWidget(self.plotScanfi)
+        tabScanPlotLayout.addWidget(self.plotScanX)
+        tabScanPlotLayout.addWidget(self.plotScanY)
 
         tabScanControlsLayout = QtWidgets.QGridLayout()
         tabScanControlsLayout.addWidget(QtWidgets.QLabel("Tačaka u scan-u"), 0, 0)
@@ -342,11 +390,15 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
         tabScanControlsLayout.addWidget(self.scanStopQDoubleSpinBox, 2, 1)
         tabScanControlsLayout.addWidget(QtWidgets.QLabel("Vreme po tački"), 3, 0)
         tabScanControlsLayout.addWidget(self.scanIntegrationQDoubleSpinBox, 3, 1)
+        tabScanControlsLayout.addWidget(QtWidgets.QLabel("Faza reference"), 4, 0)
+        tabScanControlsLayout.addWidget(self.scanPhaseQDoubleSpinBox, 4, 1)
 
-        tabScanControlsLayout.addWidget(self.startScanButton, 4, 0, 1, 2)  # sta, row, col, rowspan, colspan
+
+        tabScanControlsLayout.addWidget(self.startScanButton, 5, 0, 1, 2)  # sta, row, col, rowspan, colspan
+
         scanLabel = QtWidgets.QLabel("Neki text za laku noć koji ljudi vole da čitaju i uživaju dok mogu")
         scanLabel.setWordWrap(True)
-        tabScanControlsLayout.addWidget(scanLabel, 5, 0, 2, 2)  # text
+        tabScanControlsLayout.addWidget(scanLabel, 6, 0, 2, 2)  # text
 
         tabScanLayout = QtWidgets.QGridLayout(self.tabScan)
         tabScanLayout.addLayout(tabScanControlsLayout, 0, 0)
@@ -358,8 +410,8 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
         self.tabScan.setLayout(tabScanLayout)
 
         tabLockPlotLayout = QtWidgets.QVBoxLayout()
-        tabLockPlotLayout.addWidget(self.plotR)
-        tabLockPlotLayout.addWidget(self.plotfi)
+        tabLockPlotLayout.addWidget(self.plotX)
+        tabLockPlotLayout.addWidget(self.plotX)
 
         tabLockLayout = QtWidgets.QVBoxLayout(self)
         tabLockLayout.addLayout(tabLockPlotLayout)
@@ -379,19 +431,18 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
 
         # top HBox
         topHBox = QtWidgets.QHBoxLayout()
+
         topHBox.addWidget(self.portLabel)
         topHBox.addStretch(1)
 
         # serial input HBox
-        #serialHBox = QtWidgets.QHBoxLayout()
-        #serialHBox.addWidget(self.serialInputTextEdit)
+        # serialHBox = QtWidgets.QHBoxLayout()
+        # serialHBox.addWidget(self.serialInputTextEdit)
 
         # Tabs
         tabsHBox = QtWidgets.QHBoxLayout()
         tabsHBox.addWidget(self.tabs)
         # tabsHBox.addStretch(1)
-
-
 
         # ------------------------------------------
         #    Add HBoxes into VBox
@@ -437,9 +488,12 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
 
     def scanRun(self):
         print("Počinje scan")
-        self.due.sendToBox("scan 0") # da prekine lock ako nije već
-
         self.scanPositions()
+        command = "scan " + str(self.scanPositions_int[0])+" " + str(self.scanPositions_int[0])
+        self.due.sendToBox(command)  # da prekine lock ako nije već
+        self.due.sendToBox(command)  # da pošalje ponovo za slučaj lošeg prijema
+        time.sleep(0.1)
+
         self.timerScan.start()
 
     def scanPositions(self):
@@ -447,14 +501,17 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
         delta = dif/self.scanPoints
 
         scanPositions = np.linspace(self.scanStart, self.scanStop, self.scanPoints)
-        self.scanPositions_int = np.random.permutation(scanPositions.astype(np.int64))
+        # self.scanPositions_int = np.random.permutation(scanPositions.astype(np.int64))
+        self.scanPositions_int = scanPositions.astype(np.int64)
         print(self.scanPositions_int)
         self.scanPosGen = self.nsp(self.scanPositions_int)
-        self.scanData=[]
+        self.scanData = []
 
     def nextScanPoint(self):
         try:
-            command = "scan " + str(self.scanPosGen.__next__())
+            int_string = str(self.scanPosGen.__next__())
+            command = "scan " + int_string + " " + int_string
+            self.due.sendToBox(command)
             self.due.sendToBox(command)
             #print(command)
         except Exception as e:
@@ -467,6 +524,7 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
 
     def stabilizacija(self):
         print("Stabilizacija počinje")
+        self.mode = 'lock'
 
 ##############################################################################################
 #
