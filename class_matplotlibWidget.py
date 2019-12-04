@@ -3,10 +3,10 @@
 #  Please feel free to ask me for permission to use my code in your own projects. It is for your own well fare!
 
 import sys
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
-from matplotlib.figure import Figure
-import matplotlib
-import matplotlib.pyplot as pyplot
+#from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
+#from matplotlib.figure import Figure
+#import matplotlib
+#import matplotlib.pyplot as pyplot
 import numpy as np
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication, QSizePolicy

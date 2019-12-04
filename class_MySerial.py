@@ -66,7 +66,7 @@ class MySerial:
 
     def readLine(self):
         """Remove \r\n from the end of line """
-        return self.box.readline().decode("utf-8")[:-2]
+        return self.box.readline().decode("ascii")[:-2]  # "utf-8"
 
     def sendToBox(self, stri):
         """Prepare string to be sent to the box,

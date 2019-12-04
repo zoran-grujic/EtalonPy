@@ -42,6 +42,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # -----------------------------------------------------
         self.centralWidget = class_centralWidget.MainForm(self)  # give reference of the parent
         self.setCentralWidget(self.centralWidget)
+        self.centralWidget.setMouseTracking(True)
 
         self.show()
 
