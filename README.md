@@ -14,5 +14,7 @@ Fajl `app.pyw` je samo okvir korisničkog interfejsa. Najveći deo posla obavlja
 
 Main GIT repository https://github.com/zoran-grujic/EtalonPy.git
 
+Arduino Due code is here: https://github.com/zoran-grujic/EtalonArdEn.git
+
 
 Kopija projekta se čuva na GitLab-u. https://gitlab.com/zoran-grujic/etalonpy
