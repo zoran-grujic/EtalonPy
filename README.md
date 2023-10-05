@@ -12,4 +12,7 @@ Fajl `app.pyw` je samo okvir korisničkog interfejsa. Najveći deo posla obavlja
 
 ## GIT 
 
+Main GIT repository https://github.com/zoran-grujic/EtalonPy.git
+
+
 Kopija projekta se čuva na GitLab-u. https://gitlab.com/zoran-grujic/etalonpy
