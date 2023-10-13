@@ -34,7 +34,7 @@ import pyqtgraph as pg  # Fast plot package
 
 class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
     plotScanX = None  # type: object
-    name = "Etalon"
+    name = "Standard"
     due = False  # connection to Arduino DUE
     timer = False  # timer to read ports
     timerDisplayTime_ms = 100
@@ -144,7 +144,7 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
         #  self.plotScanX.line = 'o'
 
         self.plotScanX.setLabel('left', '<font>X</font>', units='<font>Vrms</font>', color='white', **{'font-size': '10pt'})
-        self.plotScanX.setLabel('bottom', '<font>pozicija</font>', units='<font>V</font>', color='white', **{'font-size': '10pt'})
+        self.plotScanX.setLabel('bottom', '<font>position</font>', units='<font>V</font>', color='white', **{'font-size': '10pt'})
         # cross hair
         self.vLine = pg.InfiniteLine(angle=90, movable=False)
         self.vLineCenter = pg.InfiniteLine(angle=90, movable=False)
@@ -161,27 +161,27 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
         # self.plotScanY.line = 'o'
         self.plotScanY.setLabel('left', '<font>Y</font>', units='<font>Vrms</font>', color='white',
                                 **{'font-size': '10pt'})
-        self.plotScanY.setLabel('bottom', '<font>pozicija</font>', units='<font>V</font>', color='white',
+        self.plotScanY.setLabel('bottom', '<font>position</font>', units='<font>V</font>', color='white',
                                 **{'font-size': '10pt'})
 
         self.olovkaX = pg.mkPen((100, 200, 250), width=2, style=QtCore.Qt.SolidLine)
         self.plotX = pg.PlotWidget()
         self.plotX.setLabel('left', '<font>X</font>', units='<font>Vrms</font>', color='white', **{'font-size': '10pt'})
-        self.plotX.setLabel('bottom', '<font>vreme</font>', units='<font>s</font>', color='white', **{'font-size': '10pt'})
+        self.plotX.setLabel('bottom', '<font>time</font>', units='<font>s</font>', color='white', **{'font-size': '10pt'})
 
         self.olovkaY = pg.mkPen((100, 200, 250), width=2, style=QtCore.Qt.SolidLine)
         self.plotPosHV = pg.PlotWidget()
-        self.plotPosHV.setLabel('left', '<font>pos HV PZT</font>', units='<font>V</font>', color='white', **{'font-size': '10pt'})
-        self.plotPosHV.setLabel('bottom', '<font>vreme</font>', units='<font>s</font>', color='white', **{'font-size': '10pt'})
+        self.plotPosHV.setLabel('left', '<font>OC PZT</font>', units='<font>V</font>', color='white', **{'font-size': '10pt'})
+        self.plotPosHV.setLabel('bottom', '<font>time</font>', units='<font>s</font>', color='white', **{'font-size': '10pt'})
 
         self.plotPosF = pg.PlotWidget()
-        self.plotPosF.setLabel('left', '<font>pos fine PZT</font>', units='<font>V</font>', color='white',
+        self.plotPosF.setLabel('left', '<font>HR PZT</font>', units='<font>V</font>', color='white',
                                 **{'font-size': '10pt'})
-        self.plotPosF.setLabel('bottom', '<font>vreme</font>', units='<font>s</font>', color='white',
+        self.plotPosF.setLabel('bottom', '<font>time</font>', units='<font>s</font>', color='white',
                                 **{'font-size': '10pt'})
 
         # tab buttons
-        self.startScanButton = QtWidgets.QPushButton("Počni scan", self.tabScan)
+        self.startScanButton = QtWidgets.QPushButton("Start scan", self.tabScan)
         self.startScanButton.clicked.connect(self.scanRun)
 
         """
@@ -194,25 +194,25 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
         # tab buttons
         self.startFullScanButton = QtWidgets.QPushButton("Full scan", self.tabScan)
         self.startFullScanButton.clicked.connect(self.scanFullRun)
-        tt = "Pokreće scan u punom opsegu radi potrage za rezonancama..."
+        tt = "Start full span scan..."
         self.startFullScanButton.setToolTip('<span style="color:#555555;">' + tt + '</span>')
 
         # tab buttons
         self.sendPIButton = QtWidgets.QPushButton("Submit", self.tabLock)
         self.sendPIButton.clicked.connect(self.sendPI)
-        tt = "Šalje PI parametre na kontroler"
+        tt = "Send PI parameters to ADB"
         self.sendPIButton.setToolTip('<span style="color:#555555;">' + tt + '</span>')
 
         # tab buttons
-        self.centrirajButton = QtWidgets.QPushButton("Centriraj", self.tabLock)
+        self.centrirajButton = QtWidgets.QPushButton("Center HR", self.tabLock)
         self.centrirajButton.clicked.connect(self.centrirajLok)
-        tt = "Šalje komandu da se fini PZT dovede u osnovnu poziciju."
+        tt = "Set fine HR PZT into center position."
         self.centrirajButton.setToolTip('<span style="color:#555555;">' + tt + '</span>')
 
         # tab buttons
         self.stopLockButton = QtWidgets.QPushButton("STOP lock", self.tabLock)
         self.stopLockButton.clicked.connect(self.stopLock)
-        tt = "Zaustavlja lock i vraća na scan."
+        tt = "Unlock and go to scan mode."
         self.stopLockButton.setToolTip('<span style="color:#555555;">' + tt + '</span>')
 
         # tab inputs
@@ -266,13 +266,13 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
         tt = "Treba li pomeriti fazu reference?"
         self.scanPhaseQDoubleSpinBox.setToolTip('<span style="color:#555555;">' + tt + '</span>')
 
-        self.scanStopEndCheckBox = QtWidgets.QCheckBox("Zaustavi scan na kraju", self.tabScan)
+        self.scanStopEndCheckBox = QtWidgets.QCheckBox("Stop repeat scan", self.tabScan)
         self.scanStopEndCheckBox.setCheckState(False)
         self.scanStopEndCheckBox.stateChanged.connect(self.delayChange)
-        tt = "Zaustavi skeniranje na kraju scan-a?"
+        tt = "Stop scanning when current scan reaches its end."
         self.scanStopEndCheckBox.setToolTip('<span style="color:#555555;">' + tt + '</span>')
 
-        self.hideYgraphCheckBox = QtWidgets.QCheckBox("Sakrij Y grafik", self.tabScan)
+        self.hideYgraphCheckBox = QtWidgets.QCheckBox("Hide Y graph", self.tabScan)
         self.hideYgraphCheckBox.setCheckState(False)
         self.hideYgraphCheckBox.stateChanged.connect(self.hideY)
         tt = "Da li želite da sakrijete Y grafik?"
@@ -334,7 +334,7 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
         self.sigmaLabel = QtWidgets.QLabel("Sigma: ", self.tabLock)
         # self.sigmaLabel.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
 
-        self.meanLabel = QtWidgets.QLabel("Srednja  vrednost: ", self.tabLock)
+        self.meanLabel = QtWidgets.QLabel("Mean  value: ", self.tabLock)
 
         # ------------------------------------------
         # set layout
@@ -639,7 +639,7 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
         #print("temp: ", self.temperature)
         #print("power: ", self.laserDCPower)
         tempstr=str(self.temperatureConvert(self.temperature))
-        m = "Temperatura: {0:0.1f} ˚C, Snaga lasera: {1:0.2f} µW, buffer size: {2:d}"
+        m = "Temperature: {0:0.1f} ˚C, Laser power: {1:0.2f} µW, buffer size: {2:d}"
         m = m.format(self.temperatureConvert(self.temperature)-0.2, 0.0253*self.laserDCPower, self.due.box.in_waiting)
         #self.parent.status.showMessage(m)
         self.portLabel.setText("Port: " + self.due.port + ", " + m)
@@ -729,15 +729,15 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
         self.tabScanPlotLayout.addWidget(self.plotScanY)
 
         tabScanControlsLayout = QtWidgets.QGridLayout()
-        tabScanControlsLayout.addWidget(QtWidgets.QLabel("Tačaka u scan-u"), 0, 0)
+        tabScanControlsLayout.addWidget(QtWidgets.QLabel("Scan points"), 0, 0)
         tabScanControlsLayout.addWidget(self.scanPointsLineEdit, 0, 1)
         tabScanControlsLayout.addWidget(QtWidgets.QLabel("Scan start"), 1, 0)
         tabScanControlsLayout.addWidget(self.scanStartQDoubleSpinBox, 1, 1)
         tabScanControlsLayout.addWidget(QtWidgets.QLabel("Scan stop"), 2, 0)
         tabScanControlsLayout.addWidget(self.scanStopQDoubleSpinBox, 2, 1)
-        tabScanControlsLayout.addWidget(QtWidgets.QLabel("Vreme po tački"), 3, 0)
+        tabScanControlsLayout.addWidget(QtWidgets.QLabel("Integration time"), 3, 0)
         tabScanControlsLayout.addWidget(self.scanIntegrationQDoubleSpinBox, 3, 1)
-        tabScanControlsLayout.addWidget(QtWidgets.QLabel("Faza reference"), 4, 0)
+        tabScanControlsLayout.addWidget(QtWidgets.QLabel("Reference Phase"), 4, 0)
         tabScanControlsLayout.addWidget(self.scanPhaseQDoubleSpinBox, 4, 1)
 
         # tabScanControlsLayout.addWidget(QtWidgets.QLabel("Zaustavi scan"), 5, 0)
@@ -748,7 +748,7 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
         tabScanControlsLayout.addWidget(self.hideYgraphCheckBox, 7, 0, 1, 2)
         tabScanControlsLayout.addWidget(self.startFullScanButton, 9, 0, 1, 2)
 
-        scanLabel = QtWidgets.QLabel("Uputstvo: <br>1. Kliknuti 'Full scan' za prikaz rezonanci.<br>2. Kliknuti izabranu rezonancu.<br>3. Dupli klik na mesto gde treba lokovati laser!")
+        scanLabel = QtWidgets.QLabel("Instructions: <br>1. Click 'Full scan' to see spectrum.<br>2. Click the 'f' line.<br>3. Doubleclick on the lock point!")
         scanLabel.setWordWrap(True)
         tabScanControlsLayout.addWidget(scanLabel, 100, 0, 2, 2)  # text
 
@@ -766,9 +766,9 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
         #tabLockControlsLayout.addWidget(QtWidgets.QLabel("PI parametri"), 0, 0, 1, 2)
         tabLockControlsLayout.addWidget(QtWidgets.QLabel("Integrator"), 2, 0)
         tabLockControlsLayout.addWidget(self.integralPIQDoubleSpinBox, 2, 1)
-        tabLockControlsLayout.addWidget(QtWidgets.QLabel("Proporcionalni"), 1, 0)
+        tabLockControlsLayout.addWidget(QtWidgets.QLabel("Proportional"), 1, 0)
         tabLockControlsLayout.addWidget(self.propPIQDoubleSpinBox, 1, 1)
-        tabLockControlsLayout.addWidget(QtWidgets.QLabel("Odnos HV fini"), 3, 0)
+        tabLockControlsLayout.addWidget(QtWidgets.QLabel("OC vs HV ratio"), 3, 0)
         tabLockControlsLayout.addWidget(self.fineHVratioLineEdit, 3, 1)
 
         tabLockControlsLayout.addWidget(QtWidgets.QLabel("Lock point"), 4, 0)
@@ -789,7 +789,7 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
 
 
 
-        tabLockControlsLayout.addWidget(QtWidgets.QLabel("Uputstvo:"), 100, 0, 1, 2)
+        tabLockControlsLayout.addWidget(QtWidgets.QLabel("Instructions: TBD"), 100, 0, 1, 2)
 
 
 
@@ -862,8 +862,8 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
     def connectDUE(self):
 
         msgBox = QtWidgets.QMessageBox()
-        msgBox.setWindowTitle("Lock-in modul nije pronađen")
-        msgBox.setText("Digitalni modul za detekciju trećeg izvoda nije pronađen. Proverite USB kabl.")
+        msgBox.setWindowTitle("ADB is not found")
+        msgBox.setText("Digital module for 3f detection has not been found. Check the USB cable.")
         msgBox.setIcon(QtWidgets.QMessageBox.Warning)
         msgBox.setStandardButtons(QtWidgets.QMessageBox.Retry | QtWidgets.QMessageBox.Abort)
 
@@ -879,7 +879,7 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
         return True
 
     def scanRun(self):
-        print("Počinje scan")
+        print("Starting scan")
         self.mode = 'scan'
         self.scanPositions()
         command = "scan " + str(self.scanPositions_int[0])+" " + str(self.scanPositions_int[0])
@@ -962,7 +962,7 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
 
 
 def main():
-    print("Počinje...")
+    print("Starting...")
     # print(config.sections())
     # print("Last port: ", config.get('General','port'))
 

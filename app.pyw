@@ -25,7 +25,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setWindowIcon(QtGui.QIcon('images/S-Speach-Bubble-256x256-icon.png'))
 
         self.setMinimumSize(QtCore.QSize(1000, 600))  # Set sizes
-        self.setWindowTitle("Etalon kontroler")  # Set the window title
+        self.setWindowTitle("HeNe standard controller")  # Set the window title
 
         # -----------------------------------------------------
         #
