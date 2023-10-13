@@ -197,7 +197,7 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
         self.startFullScanButton.setToolTip('<span style="color:#555555;">' + tt + '</span>')
 
         # tab buttons
-        self.sendPIButton = QtWidgets.QPushButton("Submit", self.tabLock)
+        self.sendPIButton = QtWidgets.QPushButton("Update PI", self.tabLock)
         self.sendPIButton.clicked.connect(self.sendPI)
         tt = "Send PI parameters to ADB"
         self.sendPIButton.setToolTip('<span style="color:#555555;">' + tt + '</span>')
@@ -681,9 +681,9 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
             #print(len(np.array(self.fi_data)))
             std=np.std(x)*1000
             mean = np.mean(x)*1000
-            msg = "Stand. devijacija: {0:0.2f} mVrms".format(std)
+            msg = "Std. dev.: {0:0.2f} mVrms".format(std)
             self.sigmaLabel.setText(msg)
-            msg = "Srednja  vrednost: {0:0.2f} mVrms".format(mean)
+            msg = "Mean value: {0:0.2f} mVrms".format(mean)
             self.meanLabel.setText(msg)
 
             self.plotX.clear()  # očisti graph
