@@ -3,7 +3,7 @@
 #  Please feel free to ask me for permission to use my code in your own projects. It is for your own well fare!
 
 import serial
-import class_signal
+# import class_signal
 import sys
 import glob
 import logging
@@ -22,7 +22,7 @@ class MySerial:
     status = ""
     connected = False
 
-    sig = class_signal.signal()
+    # sig = class_signal.signal()
 
     def __init__(self):
         pass

@@ -12,7 +12,7 @@ from PyQt5 import QtWidgets
 import qdarkgraystyle  #  https://pypi.org/project/qdarkgraystyle/
 
 import class_centralWidget
-import class_signal
+# import class_signal
 
 
 class MainWindow(QtWidgets.QMainWindow):

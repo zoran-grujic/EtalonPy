@@ -3,20 +3,20 @@
 #  Please feel free to ask me for permission to use my code in your own projects. It is for your own well fare!
 
 import sys
-import os
-import glob
-import serial  # conda install pyserial
+# import os
+# import glob
+# import serial  # conda install pyserial
 # import h5py  # conda install h5py
-import sip  # pip install sip
+# import sip  # pip install sip
 import time
 import numpy as np
 import threading
-import logging
+# import logging
 
 from typing import List, Any, Union
 
-import class_matplotlibWidget
-import class_signal
+# import class_matplotlibWidget
+# import class_signal
 from class_circularBuffer import CircularBuffer
 
 import class_MySerial
@@ -25,11 +25,10 @@ from PyQt5 import QtCore  # conda install pyqt
 # from PyQt5.QtCore import Qt
 from PyQt5 import QtGui
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QApplication
+# from PyQt5.QtWidgets import QApplication
 import pyqtgraph as pg  # Fast plot package
 # import pyqtgraph.examples
 # pyqtgraph.examples.run()
-
 
 
 class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
@@ -438,7 +437,7 @@ class MainForm(QtWidgets.QWidget):  # QMainWindow # QWidget
     Koristi poziciju miša od self.ouseMoved event-a.
     """
     def mouseClick(self, evt):
-        print("Klik!")
+        print("Click!")
 
         if evt.button() == 1:  # levi klik
 
